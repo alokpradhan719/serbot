@@ -1,34 +1,44 @@
-SAFEPATH - AUTONOMOUS PORTER ROBOT
-===================================
+# SafePath — Autonomous Dynamic Robot
 
-FOLDERS
-  firmware/safepath_auto/safepath_auto.ino  -> upload to the ESP32 (needs ESP32Servo library)
-  dashboard/index.html                      -> open on the laptop (double-click). Works offline.
+**An ESP32-Based Autonomous Mobile Robot with Dynamic Obstacle Avoidance, Occupancy-Grid Mapping, A* Path Planning, and Web-Based Monitoring**
 
-The robot only executes simple commands and brakes by itself.
-The laptop does all thinking: mapping, path planning, obstacle detours, shuttle.
-Wiring is exactly the same as before. Nothing new to buy.
+## Project Overview
 
-QUICK START
- 1. Upload safepath_auto.ino (USB), then unplug USB and switch the battery on.
- 2. Laptop: join Wi-Fi "SafePath_Robot" (password SafePath123).
- 3. Open dashboard/index.html in Chrome or Edge, click Connect.
-    If the browser asks to allow access to local network devices, click Allow.
-    If Connect still fails: open a terminal in the dashboard folder, run
-        python -m http.server 8000
-    and open http://localhost:8000
- 4. Calibrate (Calibration & settings): "Test: drive 2 s" -> measure cm -> Apply.
-    "Test: turn 90°" -> enter how many degrees it really turned -> Apply.
- 5. Mark a HOME spot on the floor with tape. Put the robot there facing "ahead".
- 6. Click "Initiate mapping". The robot explores, then comes back home.
- 7. Start = home, End = picked automatically (or click Set start / Set end on the map).
- 8. Set trips, click "Start shuttle". STOP button halts everything at any time.
+SafePath is an autonomous dynamic robot project designed to navigate indoor environments, detect obstacles, update its environment map, and plan paths toward a destination. The system combines ultrasonic sensors, servo-based scanning, motor control, Wi-Fi communication, occupancy-grid mapping, and A* path planning.
 
-TIPS
- - Use a small, tidy area first (about 3 m x 3 m) with straight walls or cardboard walls.
- - Without wheel sensors, position is estimated from time and corrected with the walls.
-   If the robot gets confused: STOP, put it on the home mark facing ahead,
-   click "Robot is at home" (Map file section), then continue.
- - Save the map (Map file > Save map) so you do not need to map again next time.
- - Recalibrate when the battery is getting low (the robot gets slower).
- - The phone page at http://192.168.4.1 still works for manual driving.
+The ESP32 handles low-level hardware operations, including sensor acquisition, servo control, motor control, Wi-Fi communication, and local safety logic. A web-based dashboard supports environment mapping, path planning, mission management, calibration, and real-time robot monitoring.
+
+The objective of SafePath is to develop and demonstrate an autonomous mobile robotic system capable of responding to environmental changes and navigating around detected obstacles.
+
+## Project Name
+
+**SafePath — Autonomous Dynamic Robot**
+
+## Key Features
+
+- Dynamic obstacle detection using ultrasonic sensors.
+- Servo-based scanning using the front ultrasonic sensor.
+- Motor control through an L298N motor driver.
+- Occupancy-grid environment mapping.
+- A* algorithm for path planning.
+- Obstacle-aware route planning and replanning.
+- Wi-Fi-based communication between the ESP32 and dashboard.
+- Web-based robot monitoring, mapping, and mission controls.
+- Local safety logic and stop commands.
+
+*Note: Actual autonomous navigation and dynamic obstacle avoidance must be validated through physical hardware testing.*
+
+## Technologies Used
+
+- ESP32 and Arduino framework
+- C/C++
+- HTML, CSS, and JavaScript
+- Ultrasonic sensors and servo motor
+- L298N motor driver and DC motors
+- Wi-Fi and HTTP API
+- Occupancy-grid mapping
+- A* path-planning algorithm
+
+## Repository
+
+GitHub: https://github.com/alokpradhan719/serbot
