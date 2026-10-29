@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SafePath Control</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+      <rect x="2" y="2" width="28" height="28" rx="8" fill="var(--accent)"/>
+      <path d="M8 22 L13 15 L18 19 L24 9" stroke="#06131c" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="24" cy="9" r="2.6" fill="#06131c"/>
+    </svg>
+    <div><b>SafePath</b><span>Autonomous porter control</span></div>
+  </div>
+
+  <div class="conn">
+    <input id="ip" value="192.168.4.1" spellcheck="false" aria-label="Robot IP">
+    <button id="connectBtn" class="btn">Connect</button>
+    <span class="pill" id="connPill"><i></i><span>Offline</span></span>
+  </div>
+
+  <button id="estop" class="estop">■ STOP</button>
+</header>
+
+<main class="layout">
+  <section class="card mapPanel">
+    <div class="mapHead">
+      <div class="title">
+        <h2>Live map</h2>
+        <span id="phaseLabel" class="phase">IDLE</span>
+        <span id="phaseText" class="phaseText">Join the robot Wi-Fi, then click Connect.</span>
+      </div>
+      <div class="tools">
+        <button class="btn tool" data-tool="start">Set start</button>
+        <button class="btn tool" data-tool="end">Set end</button>
+        <button class="btn" id="autoEndBtn">Auto end</button>
+      </div>
+    </div>
+    <div class="canvasWrap" id="canvasWrap">
+      <canvas id="map"></canvas>
+      <div class="hint" id="toolHint"></div>
+      <div class="legend">
+        <span><i class="lg free"></i>Free</span>
+        <span><i class="lg occ"></i>Obstacle</span>
+        <span><i class="lg dyn"></i>Temporary</span>
+        <span><i class="lg unk"></i>Unknown</span>
+        <span><i class="lg path"></i>Plan</span>
+      </div>
+    </div>
+  </section>
+
+  <aside class="side">
+    <div class="card">
+      <h3>Mission</h3>
+      <ol class="steps">
+        <li id="st1">
+          <span class="num">1</span>
+          <div class="stepBody">
+            <b>Map the room</b>
+            <small>Robot explores, builds the map, then returns home.</small>
+            <button id="mapBtn" class="btn primary" disabled>Initiate mapping</button>
+          </div>
+        </li>
+        <li id="st2">
+          <span class="num">2</span>
+          <div class="stepBody">
+            <b>Choose start &amp; end</b>
+            <small id="seText">Start = home. End is picked automatically – or click the map.</small>
+          </div>
+        </li>
+        <li id="st3">
+          <span class="num">3</span>
+          <div class="stepBody">
+            <b>Run porter shuttle</b>
+            <div class="row">
+              <label>Trips <input id="trips" type="number" min="0" value="3"></label>
+              <label>Wait (s) <input id="dwell" type="number" min="0" value="3"></label>
+            </div>
+            <small>Trips 0 = keep going until stopped.</small>
+            <button id="runBtn" class="btn primary" disabled>Start shuttle</button>
+          </div>
+        </li>
+      </ol>
+      <div class="row">
+        <button id="homeBtn" class="btn" disabled>Return home</button>
+        <button id="pauseBtn" class="btn" disabled>Pause</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Live sensors</h3>
+      <div class="gauges">
+        <div class="gauge"><span>Front</span><b id="gFront">--</b><div class="bar"><i id="bFront"></i></div></div>
+        <div class="gauge"><span>Back</span><b id="gBack">--</b><div class="bar"><i id="bBack"></i></div></div>
+      </div>
+      <div class="kv">
+        <div><span>Position</span><b id="tPose">–</b></div>
+        <div><span>Facing</span><b id="tHead">–</b></div>
+        <div><span>Servo</span><b id="tServo">–</b></div>
+        <div><span>Action</span><b id="tAct">idle</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Statistics</h3>
+      <div class="stats">
+        <div><b id="sArea">0.0</b><span>m² mapped</span></div>
+        <div><b id="sScans">0</b><span>scans</span></div>
+        <div><b id="sDist">0.0</b><span>m driven</span></div>
+        <div><b id="sDeliv">0</b><span>deliveries</span></div>
+        <div><b id="sObs">0</b><span>obstacles met</span></div>
+        <div><b id="sReplan">0</b><span>detours</span></div>
+      </div>
+    </div>
+
+    <details class="card" id="calCard">
+      <summary>Calibration &amp; settings</summary>
+      <p class="note">The BO motors have no wheel sensors, so distance is worked out from time.
+        Calibrate once (and again when the battery gets low).</p>
+      <div class="calTest">
+        <button class="btn" id="calDriveBtn">Test: drive 2 s</button>
+        <label>Measured <input id="calCm" type="number" placeholder="cm"></label>
+        <button class="btn" id="calCmApply">Apply</button>
+      </div>
+      <div class="calTest">
+        <button class="btn" id="calTurnBtn">Test: turn 90°</button>
+        <label>Actually turned <input id="calDeg" type="number" placeholder="deg"></label>
+        <button class="btn" id="calDegApply">Apply</button>
+      </div>
+      <div class="grid2" id="settingsGrid"></div>
+      <button class="btn" id="resetSettings">Reset to defaults</button>
+    </details>
+
+    <details class="card">
+      <summary>Map file</summary>
+      <div class="row wrap">
+        <button class="btn" id="saveMap">Save map</button>
+        <button class="btn" id="loadMapBtn">Load map</button>
+        <input type="file" id="loadMap" accept=".json" hidden>
+        <button class="btn" id="resetPose">Robot is at home</button>
+        <button class="btn danger" id="clearMap">Clear map</button>
+      </div>
+      <p class="note">“Robot is at home” – place the robot back on its home mark, facing the same way it started, then click this to cancel any drift.</p>
+    </details>
+
+    <div class="card logCard">
+      <h3>Activity</h3>
+      <div id="log"></div>
+    </div>
+  </aside>
+</main>
+
+<script src="js/map.js"></script>
+<script src="js/robot.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
